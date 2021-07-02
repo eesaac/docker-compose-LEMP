@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  nginx:
+    image: nginx:stable-perl
+    container_name: LEMP_NGINX
+    ports:
+      - "8080:80"
+    volumes:
+      - ./code:/code
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - php
+  php:
+    image: php:8-fpm-alpine3.13
+    container_name: LEMP_PHP
+    volumes:
+      - ./code:/code
+  mariaDB:
+    image: mariadb:10.6
+    container_name: LEMP_MARIADB
+    volumes:
+      - ./database:/var/lib/mysql:rw
+    ports:
+      - "3366:3306"
+    depends_on:
+      - nginx
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+  phpmyadmin:
+    image: phpmyadmin:5.0
+    container_name: LEMP_PHPMYADMIN
+    ports:
+      - "8181:80"
+    environment:
+      PMA_ARBITRARY: 1
+    depends_on:
+      - mariaDB
